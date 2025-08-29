@@ -1,0 +1,234 @@
+
+
+
+
+//modified code down 
+import React, { useContext, useState } from 'react'
+import "./main.css"
+import { assets } from '../../assets/assets'
+import { Context } from '../../context/Context'
+
+const Main = () => {
+  const { 
+    recentPrompt,
+    showResult,
+    loading,
+    resultData,
+    input,
+    error,
+    setInput,
+    onSent
+  } = useContext(Context)
+
+  const [showPopup, setShowPopup] = useState(false)
+  const [popupMessage, setPopupMessage] = useState("")
+  const [popupType, setPopupType] = useState("") // "success", "error", "info"
+
+  const handleSend = () => {
+    if (input.trim()) {
+      onSent(input);
+      setInput('');
+    }
+  }
+
+  const handleQuickPrompt = (promptText) => {
+    onSent(promptText);
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && input.trim()) {
+      handleSend();
+    }
+  }
+
+  // Copy to clipboard function
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(resultData);
+      showPopupMessage("Copied to clipboard!", "success");
+    } catch (err) {
+      showPopupMessage("Failed to copy", "error");
+    }
+  }
+
+  // Like functionality
+  const handleLike = () => {
+    showPopupMessage("Thanks for your feedback!", "success");
+    // Here you can add API call to save like
+  }
+
+  // Dislike functionality
+  const handleDislike = () => {
+    showPopupMessage("We'll improve our response.", "info");
+    // Here you can add API call to save dislike
+  }
+
+  // Show popup message
+  const showPopupMessage = (message, type) => {
+    setPopupMessage(message);
+    setPopupType(type);
+    setShowPopup(true);
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      setShowPopup(false);
+    }, 1000);
+  }
+
+  const formatResponse = (text) => {
+    if (!text) return text;
+
+    let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
+    formattedText = formattedText.replace(/^(\d+)\.\s+(.*)$/gm, '<li>$2</li>');
+    formattedText = formattedText.replace(/(<li>.*<\/li>)/gs, '<ol>$1</ol>');
+    formattedText = formattedText.replace(/^-\s+(.*)$/gm, '<li>$1</li>');
+    formattedText = formattedText.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+    formattedText = formattedText.replace(/^#\s+(.*)$/gm, '<h3>$1</h3>');
+    formattedText = formattedText.replace(/^##\s+(.*)$/gm, '<h4>$1</h4>');
+    formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    formattedText = formattedText.replace(/\n/g, '<br/>');
+
+    return { __html: formattedText };
+  }
+
+  return (
+    <div className='main'>
+      {/* Popup Notification */}
+      {showPopup && (
+        <div className={`popup-notification ${popupType}`}>
+          <div className="popup-content">
+            <span className="popup-message">{popupMessage}</span>
+            <button 
+              className="popup-close"
+              onClick={() => setShowPopup(false)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="nav">
+        <p>Gemini</p>
+        <img src={assets.user_icon} alt="User" />
+      </div>
+      
+      <div className="main-container">
+        {!showResult ? (
+          <>
+            <div className="greet">
+              <p><span>Hello, dev.</span></p>
+              <p>How can I help you today?</p>
+            </div>
+            
+            <div className="cards">
+              <div className="card" onClick={() => handleQuickPrompt("Suggest beautiful places to see on an upcoming road trip")}>
+                <p>Suggest beautiful places to see on an upcoming road trip</p>
+                <img src={assets.compass_icon} alt="Compass" />
+              </div>
+
+              <div className="card" onClick={() => handleQuickPrompt("Briefly summarize this concept: Urban planning")}>
+                <p>Briefly summarize this concept: Urban planning</p>
+                <img src={assets.bulb_icon} alt="Bulb" />
+              </div>
+
+              <div className="card" onClick={() => handleQuickPrompt("Brainstorm team bonding activities for our work retreat")}>
+                <p>Brainstorm team bonding activities for our work retreat</p>
+                <img src={assets.message_icon} alt="Message" />
+              </div>
+
+              <div className="card" onClick={() => handleQuickPrompt("Improve the readability of the following code")}>
+                <p>Improve the readability of the following code</p>
+                <img src={assets.code_icon} alt="Code" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="result-area">
+            <div className="recent-prompt">
+              <div className="prompt-header">
+                <img src={assets.user_icon} alt="User" className="user-icon" />
+                <h3>{recentPrompt}</h3>
+              </div>
+            </div>
+            
+            {loading ? (
+              <div className="loading-container">
+                <img src={assets.gemini_icon} alt="Gemini" className="gemini-loading" />
+                <div className="loading-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            ) : (
+              <div className="result-container">
+                <div className="gemini-response">
+                  <img src={assets.gemini_icon} alt="Gemini" className="gemini-icon" />
+                  <div 
+                    className="result-content" 
+                    dangerouslySetInnerHTML={formatResponse(resultData)}
+                  />
+                </div>
+                
+                {/* Response Actions */}
+                <div className="response-actions">
+                  <button className="action-btn" onClick={handleLike} title="Like this response">
+                    <img src={assets.thumbs_up_icon || assets.bulb_icon} alt="Like" />
+                  </button>
+                  <button className="action-btn" onClick={handleDislike} title="Dislike this response">
+                    <img src={assets.thumbs_down_icon || assets.bulb_icon} alt="Dislike" />
+                  </button>
+                  <button className="action-btn" onClick={copyToClipboard} title="Copy to clipboard">
+                    <img src={assets.copy_icon || assets.gallery_icon} alt="Copy" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="error-message">
+            <img src={assets.warning_icon || assets.question_icon} alt="Error" />
+            <span>Error: {error}</span>
+          </div>
+        )}
+
+        <div className="main-bottom">
+          <div className="search-box">
+            <input 
+              onChange={(e) => setInput(e.target.value)}
+              value={input}
+              type="text" 
+              placeholder='Enter a prompt here'
+              onKeyPress={handleKeyPress}
+              disabled={loading}
+            />
+            <div className="search-icons">
+              <img src={assets.gallery_icon} alt="Upload" title="Upload file" />
+              <img src={assets.mic_icon} alt="Voice input" title="Voice input" />
+              <img 
+                onClick={handleSend} 
+                src={assets.send_icon} 
+                alt="Send" 
+                className={input.trim() ? 'active' : 'inactive'}
+                title="Send message"
+              />
+            </div>
+          </div>
+          
+          <p className="bottom-info">
+            Gemini may display inaccurate info, including about people, so double-check its responses. Your privacy and Gemini Apps
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Main
+
+

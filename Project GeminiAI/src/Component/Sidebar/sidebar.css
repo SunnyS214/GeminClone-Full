@@ -1,0 +1,128 @@
+
+.sidebar {
+  height: 100vh;
+  width: 70px;
+  background: #f0f4f9; 
+  color: #282828;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.3s ease-in-out;
+  overflow: hidden;
+  border-right: 1px solid #e2e6eb;
+}
+
+.sidebar.extended {
+  width: 260px;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.top {
+  padding: 15px;
+}
+
+.menu {
+  width: 25px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: transform 0.2s;
+}
+
+.menu:hover {
+  transform: rotate(90deg);
+}
+
+.new-chat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 50px;
+  cursor: pointer;
+  background: #e6eaf1;
+  font-size: 14px;
+  color: grey;
+  transition: background 0.2s;
+}
+
+.new-chat img {
+  width: 20px;
+}
+
+.new-chat:hover {
+  background: #e2e6eb;
+}
+
+.recent {
+  margin-top: 25px;
+}
+
+.recent-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: grey;
+  padding-left: 10px;
+}
+
+.recent-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 50px;
+  font-size: 14px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.recent-entry img {
+  width: 18px;
+}
+
+.recent-entry:hover {
+  background: #e2e6eb;
+  transform: scale(1.02);
+}
+
+.no-recent {
+  font-size: 13px;
+  color: grey;
+  padding-left: 12px;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* Bottom Section */
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 15px;
+  border-top: 1px solid #e2e6eb;
+}
+
+.bottom-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50px;
+  font-size: 14px;
+  color: grey;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.bottom-item img {
+  width: 18px;
+}
+
+.bottom-item:hover {
+  background: #e6eaf1;
+  transform: scale(1.02);
+}
